@@ -23,7 +23,7 @@ Esta aplicación está diseñada para gestionar el inventario de la empresa, inc
 
 1. Clona este repositorio:
    ```bash
-   git clone https://github.com/tuusuario/tuzonapcgamerweb.git
+   git clone https://github.com/kronnos2312/TuZonaPCGamer.git
    cd tuzonapcgamerweb
 
 #
