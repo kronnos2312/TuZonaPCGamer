@@ -1,25 +1,120 @@
 'use client';
 
-import { useEffect } from 'react';
-import {userProductStore} from '@/app/store/userProductStore';
+import { useEffect, useState } from 'react';
+import { userProductStore } from '@/app/store/userProductStore';
+
+interface Product {
+  id: number | string;
+  name: string;
+  model: string;
+  brand: string;
+}
 
 export default function ProductTable() {
-  const {product, fetchProduct} = userProductStore();
+  const { product, fetchProduct } = userProductStore();
+
+  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
   useEffect(() => {
     fetchProduct();
-  }, [fetchProduct]);
-  
+  }, []); // si fetchProduct es estable, está bien poner un arreglo vacío
+
+  // Filtrar productos por búsqueda
+  const filteredProducts = product.filter((item: Product) =>
+    `${item.name} ${item.model} ${item.brand}`.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Calcular paginación
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+
+  // Reiniciar a página 1 al buscar o cambiar items por página
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, itemsPerPage]);
+
   return (
-    <div>
-      <h1>Productos Global (Zustand)</h1>    
-      <ul>
-        {product.map((item) => (
-          <li key={item.id}>
-            Nombre Producto {item.name} - {item.model} Unidades - {item.brand} 
-          </li>
-        ))}
-      </ul>
-    
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4 text-black">Productos</h1>
+
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Buscar por nombre, modelo o marca..."
+          className="w-full sm:w-1/2 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        <div>
+          <label htmlFor="itemsPerPage" className="mr-2 text-sm text-gray-600">Mostrar:</label>
+          <select
+            id="itemsPerPage"
+            value={itemsPerPage}
+            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+          <thead className="bg-gray-100 border-b">
+            <tr>
+              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Nombre</th>
+              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Modelo</th>
+              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Marca</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedProducts.length > 0 ? (
+              paginatedProducts.map((item) => (
+                <tr key={item.id} className="border-b hover:bg-gray-50">
+                  <td className="px-6 py-4 text-black">{item.name}</td>
+                  <td className="px-6 py-4 text-black">{item.model}</td>
+                  <td className="px-6 py-4 text-black">{item.brand}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
+                  No se encontraron productos.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Controles de paginación */}
+      <div className="flex justify-between items-center mt-4">
+        <span className="text-sm text-gray-600">
+          Página {currentPage} de {totalPages || 1}
+        </span>
+        <div className="space-x-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+          >
+            Anterior
+          </button>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages || totalPages === 0}
+            className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

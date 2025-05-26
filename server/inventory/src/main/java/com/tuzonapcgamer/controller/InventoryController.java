@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://172.23.112.1:3000")
+@CrossOrigin(origins = "http://172.22.96.1:3000")
 @RequestMapping("/inventory")
 public class InventoryController {
 
