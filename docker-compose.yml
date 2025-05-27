@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./server/inventory
+    ports:
+      - "8080:8080"
+    container_name: tuzonapcgamer-backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Permite acceso al host en Linux también
+
+  frontend:
+    build:
+      context: ./web/tuzonapcgamerweb
+    ports:
+      - "3000:3000"
+    container_name: tuzonapcgamer-frontend
