@@ -38,8 +38,21 @@ public class InventoryImpl implements InventoryService {
 
     @Override
     public InventoryItem save(InventoryItem manufacturer) {
+        if( manufacturer.getId() != 0){
+            return repository.save(manufacturer);
+        }
+        return createInventoryItem(manufacturer);
+    }
+
+    private InventoryItem createInventoryItem(InventoryItem manufacturer){
+        manufacturer.setId(null);
+        if( manufacturer.getProduct().getId() == 0){
+            manufacturer.getProduct().setId(null);
+        }
+
         return repository.save(manufacturer);
     }
+
 
     @Override
     public void deleteById(Long id) {

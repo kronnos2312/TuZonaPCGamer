@@ -2,13 +2,60 @@
 
 import { useEffect, useState } from 'react';
 import { useInventoryStore } from '@/app/store/useInventoryStore';
+import InventoryEditor from '../inventory/editor/Inventory';
+import Modal from '../base/context/Modal';
+import { InventoryItem } from '@/app/model/InventoryItem';
+import { Product } from '@/app/model/Product';
 
+type EditorType =  'inventory' | null;
+const emptyProduct: Product = {
+  id: 0,
+  name: '',
+  brand: '',
+  model: '',
+};
+const currentItem: InventoryItem = {
+  id: 0,
+  quantity: 0,
+  price: 0,
+  description: '',
+  arrivalDate: '',
+  barcode: '',
+  product: emptyProduct,
+};
 export default function InventoryTable() {
-  const { inventory, fetchInventory } = useInventoryStore();
+   // MODAL EDITOR
+  const [open, setOpen] = useState(false);
+  const [editor, setEditor] = useState<EditorType>(null);
+  const formatDateForInput = (date: string) => {
+    return date ? date.split('T')[0] : '';
+  };
+  const openEditor = (item:any) => {
+    currentItem.id = item.id;
+    currentItem.arrivalDate = formatDateForInput(item.arrivalDate);
+    currentItem.barcode = item.barcode;
+    currentItem.description = item.description;
+    currentItem.price = item.price;
+    currentItem.quantity = item.quantity;
+    
+    currentItem.product.id = item.product.id;
+    currentItem.product.brand = item.product.brand;
+    currentItem.product.model = item.product.model;
+    currentItem.product.name = item.product.name;
+    setEditor('inventory');
+    setOpen(true);
+  };
+  const closeModal = () => {
+    setOpen(false);
+    setEditor(null);
+  };
+  // Component Funtions
+  const { inventory, fetchInventory, deleteInventory } = useInventoryStore();
 
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  
   useEffect(() => {
     fetchInventory();
   }, [fetchInventory]);
@@ -68,6 +115,9 @@ export default function InventoryTable() {
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Marca</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Fecha Ingreso</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Codigo Barras</th>
+              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Descripcion</th>
+              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Modficar Registro</th>
+              {/* <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Remover</th>*/}
             </tr>
           </thead>
           <tbody>
@@ -78,8 +128,14 @@ export default function InventoryTable() {
                   <td className="px-6 py-4 text-black">{item.quantity}</td>
                   <td className="px-6 py-4 text-black">{item.price}</td>
                   <td className="px-6 py-4 text-black">{item.product.model}</td>
-                  <td className="px-6 py-4 text-black">{item.arrivalDate}</td>
+                  <td className="px-6 py-4 text-black">{formatDateForInput(item.arrivalDate)}</td>
                   <td className="px-6 py-4 text-black">{item.barcode}</td>
+                  <td className="px-6 py-4 text-black">{item.description}</td>
+                  <td className="px-6 py-4 text-black"><button 
+                  className="px-3 py-1 bg-yellow-200 text-black-700 rounded"
+                  onClick={()=>openEditor(item)}
+                  >Editar</button></td>
+                  {/*  <td className="px-6 py-4 text-black"><button className="px-3 py-1 bg-red-200 text-black-700 rounded">Remover</button></td>*/}
                 </tr>
               ))
             ) : (
@@ -114,6 +170,28 @@ export default function InventoryTable() {
           </button>
         </div>
       </div>
+
+
+
+      {/* ===========================
+        Modal de editores
+        =========================== */
+      }
+    <Modal
+      isOpen={open}
+      onClose={closeModal}
+      title='Editar Inventario'           
+    >
+      {editor === 'inventory' && (
+        <InventoryEditor
+          initialData={currentItem}
+          onSave={(data) => {
+            console.log('Inventario guardado:', data);
+            closeModal();
+          }}
+        />
+      )}
+    </Modal>
     </div>
   );
 }

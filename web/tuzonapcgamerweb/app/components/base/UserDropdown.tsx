@@ -33,8 +33,7 @@ export default function UserDropdown() {
       <button
         onClick={() => setOpen(!open)}
         className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-lg hover:bg-gray-300 transition"
-        aria-label="Abrir menú de usuario"
-      >
+        aria-label="Abrir menú de usuario">
         ⚙️
       </button>
 

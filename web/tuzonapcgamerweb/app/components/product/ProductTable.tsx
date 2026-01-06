@@ -3,14 +3,41 @@
 import { useEffect, useState } from 'react';
 import { userProductStore } from '@/app/store/userProductStore';
 
-interface Product {
+import Modal from '../base/context/Modal';
+import ProductEditor from './editor/Product';
+import { Product } from '@/app/model/Product';
+/*interface Product {
   id: number | string;
   name: string;
   model: string;
   brand: string;
-}
+}*/
+type EditorType = 'product' | null;
+const currentItem: Product = {
+  id:0,
+  name:'',
+  model:'',
+  brand:''
+};
 
 export default function ProductTable() {
+  // MODAL EDITOR
+  const [open, setOpen] = useState(false);
+  const [editor, setEditor] = useState<EditorType>(null);
+  const openEditor = (item:any) => {
+    currentItem.id = item.id;
+    currentItem.name = item.name;
+    currentItem.model = item.model;
+    currentItem.brand = item.brand;
+    console.log(JSON.stringify(currentItem))
+    setEditor('product');
+    setOpen(true);
+  }
+  const closeModal = () => {
+    setOpen(false);
+    setEditor(null);
+  };
+  // Component Functions
   const { product, fetchProduct } = userProductStore();
 
   const [search, setSearch] = useState('');
@@ -68,18 +95,27 @@ export default function ProductTable() {
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead className="bg-gray-100 border-b">
             <tr>
+              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Id</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Nombre</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Modelo</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Marca</th>
+              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Modficar Registro</th>
+             {/* <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Remover</th>*/}
             </tr>
           </thead>
           <tbody>
             {paginatedProducts.length > 0 ? (
               paginatedProducts.map((item) => (
                 <tr key={item.id} className="border-b hover:bg-gray-50">
+                  <td className="px-6 py-4 text-black">{item.id}</td>
                   <td className="px-6 py-4 text-black">{item.name}</td>
                   <td className="px-6 py-4 text-black">{item.model}</td>
                   <td className="px-6 py-4 text-black">{item.brand}</td>
+                  <td className="px-6 py-4 text-black"><button 
+                  className="px-3 py-1 bg-yellow-200 text-black-700 rounded"
+                  onClick={()=>openEditor(item)}
+                  >Editar</button></td>
+                 {/*  <td className="px-6 py-4 text-black"><button className="px-3 py-1 bg-red-200 text-black-700 rounded">Remover</button></td>*/}
                 </tr>
               ))
             ) : (
@@ -115,6 +151,26 @@ export default function ProductTable() {
           </button>
         </div>
       </div>
+
+       {/* ===========================
+              Modal de editores
+              =========================== */
+            }
+          <Modal
+            isOpen={open}
+            onClose={closeModal}
+            title='Editar Producto'           
+          >
+            {editor === 'product' && (
+              <ProductEditor
+                initialData={currentItem}
+                onSave={(data) => {
+                  console.log('Producto guardado:', data);
+                  closeModal();
+                }}
+              />
+            )}
+          </Modal>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 package com.tuzonapcgamer.service.facade;
 
+import com.tuzonapcgamer.dto.ProductDTO;
 import com.tuzonapcgamer.model.InventoryItem;
 import com.tuzonapcgamer.model.Product;
 
@@ -10,7 +11,7 @@ public interface ProductService {
     Optional<Product> getById(Long id);
 
     List<Product> getAll();
-
+    Product validateOrSave(ProductDTO product);
     Product save(Product product);
 
     void deleteById(Long id);

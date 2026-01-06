@@ -1,5 +1,6 @@
 package com.tuzonapcgamer.service.implement;
 
+import com.tuzonapcgamer.dto.ProductDTO;
 import com.tuzonapcgamer.model.InventoryItem;
 import com.tuzonapcgamer.model.Product;
 import com.tuzonapcgamer.repository.ProductREP;
@@ -23,6 +24,20 @@ public class ProductImpl implements ProductService {
     @Override
     public List<Product> getAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public Product validateOrSave(ProductDTO productDTO) {
+        Product product;
+        if (productDTO.getId() == 0) {
+            // Crear producto nuevo
+            product = repository.save(productDTO.cast());
+        } else {
+            // Usar producto existente
+            product = repository.findById(productDTO.getId())
+                    .orElseThrow(() -> new RuntimeException("Product no existe"));
+        }
+        return product;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.tuzonapcgamer.controller;
 
+import com.tuzonapcgamer.dto.ProductDTO;
 import com.tuzonapcgamer.model.InventoryItem;
 import com.tuzonapcgamer.model.Product;
 import com.tuzonapcgamer.service.facade.ProductService;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://172.22.96.1:3000")
+@CrossOrigin(origins = "http:/localhost:3000")
 @RequestMapping("/product")
 public class ProductController {
     @Autowired private ProductService service;
@@ -27,6 +28,13 @@ public class ProductController {
         if(object.getId() == null)
             return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(this.service.save(object));
+    }
+
+    @PostMapping("/dto")
+    public ResponseEntity<Product> saveDTO(@RequestBody ProductDTO object) {
+        if(object.getId() == null)
+            return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(this.service.save(object.cast()));
     }
 
     @GetMapping("/inventory/id/{id}")
