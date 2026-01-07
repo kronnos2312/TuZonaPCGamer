@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import {InventoryItem} from '../model/InventoryItem'
 
 import { useToastStore } from "./useToastStore";
+import { useLoaderStore } from '@/app/store/useLoaderStore';
 type State = {
   inventory: InventoryItem[];
   inventoryShow: InventoryItem;
@@ -80,11 +81,14 @@ export const useInventoryStore = create<State>((set,get) => ({
   },
 
   fetchInventory: async () => {
+    const { showLoader, hideLoader } = useLoaderStore.getState();
+    showLoader();
     try {
       const res = await fetch(`${API_BASE_URL}/inventory`);
       if (!res.ok) throw new Error('Error al obtener inventario');
       const data = await res.json();
       set({ inventory: data });
+      hideLoader();
     } catch (error) {
       console.error('Fetch inventory error:', error);
     }

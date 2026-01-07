@@ -4,6 +4,7 @@ import com.tuzonapcgamer.model.InventoryItem;
 import com.tuzonapcgamer.repository.InventoryItemREP;
 import com.tuzonapcgamer.service.facade.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,6 +19,11 @@ public class InventoryImpl implements InventoryService {
 
     @Override
     public List<InventoryItem> getAll() {
+        return repository.findAll();
+    }
+
+    @Override
+    public List<InventoryItem> getAll(Pageable pageable) {
         return repository.findAll();
     }
 

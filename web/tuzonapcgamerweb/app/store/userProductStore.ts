@@ -2,6 +2,8 @@
 import { create } from 'zustand'
 import { Product } from '../model/Product';
 import { useToastStore } from "./useToastStore";
+
+import { useLoaderStore } from '@/app/store/useLoaderStore';
 type State = {
   product: Product[];
   showProduct: Product;
@@ -24,6 +26,7 @@ const currentProduct: Product = {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+
 export const userProductStore = create<State>((set, get) => ({
   product: [],
   showProduct: currentProduct,
@@ -35,11 +38,14 @@ export const userProductStore = create<State>((set, get) => ({
   clearShowProduct: () => set({ showProduct: currentProduct }),
 
   fetchProduct: async () => {
+    const { showLoader, hideLoader } = useLoaderStore.getState();
+    showLoader();
     try {
       const res = await fetch(`${API_BASE_URL}/product`);
       if (!res.ok) throw new Error('Error al obtener productos');
       const data = await res.json();
       set({ product: data });
+      hideLoader();
     } catch (error) {
       console.error('Fetch product error:', error);
     }

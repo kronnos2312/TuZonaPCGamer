@@ -23,7 +23,7 @@ export default function Layout({ children, activeTab, onTabChange }: LayoutProps
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-start sm:items-center mb-4">
             <div className="text-sm text-gray-500 flex items-center">
-              Dashboard /
+              Usted Esta en:/
               <span className="text-gray-700 font-medium ml-1 capitalize">{activeTab}</span>
             </div>
             <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-lg ml-2">

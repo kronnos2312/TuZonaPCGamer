@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Systems from './Systems';
+import Image from 'next/image';
+
 
 export default function UserDropdown() {
   const [open, setOpen] = useState(false);
@@ -30,12 +32,21 @@ export default function UserDropdown() {
 
   return (
     <div className="relative" ref={dropdownRef}>
+      {/*
       <button
         onClick={() => setOpen(!open)}
         className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-lg hover:bg-gray-300 transition"
         aria-label="Abrir menú de usuario">
         ⚙️
       </button>
+      */}
+      <Image
+        src="/img/Testing_LOGO.png"
+        alt="Cargando..."
+        width={80}
+        height={80}
+        priority
+      />
 
       {open && (
         <div className="absolute left-0 mt-2 w-48 bg-white shadow-md border rounded-md text-sm z-50">

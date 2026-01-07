@@ -1,6 +1,7 @@
 package com.tuzonapcgamer.service.facade;
 
 import com.tuzonapcgamer.model.InventoryItem;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.Optional;
 public interface InventoryService {
 
     List<InventoryItem> getAll();
+    List<InventoryItem> getAll(Pageable pageable);
 
     List<InventoryItem> getdAllByYear(Date date);
 
