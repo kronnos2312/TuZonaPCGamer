@@ -1,5 +1,6 @@
 package com.tuzonapcgamer.service.facade;
 
+import com.tuzonapcgamer.dto.WInventory;
 import com.tuzonapcgamer.model.InventoryItem;
 import org.springframework.data.domain.Pageable;
 
@@ -19,6 +20,7 @@ public interface InventoryService {
     Optional<InventoryItem> getByBarCode(String name);
 
     InventoryItem save(InventoryItem manufacturer);
+    WInventory SaveOUT(WInventory wInventory);
 
     void deleteById(Long id);
 

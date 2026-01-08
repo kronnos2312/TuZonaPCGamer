@@ -28,6 +28,11 @@ public class InventoryItem extends BaseEntity{
     private Date arrivalDate;
 
     /**
+     * Fecha en que este ítem fue retirado al inventario.
+     */
+    @Column(name = "outDate")
+    private Date outDate;
+    /**
      * Relación con el producto al que pertenece este ítem.
      */
     @ManyToOne(optional = false)
@@ -65,7 +70,16 @@ public class InventoryItem extends BaseEntity{
         this.description = description;
     }
 
+
     public InventoryItem() {
+    }
+
+    public Date getOutDate() {
+        return outDate;
+    }
+
+    public void setOutDate(Date outDate) {
+        this.outDate = outDate;
     }
 
     public String getBarcode() {

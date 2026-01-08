@@ -9,8 +9,10 @@ import ProductEditor from '../product/editor/Product';
 
 import { Product } from '@/app/model/Product';
 import { InventoryItem } from '@/app/model/InventoryItem';
+import { WInventory } from '@/app/model/WithdrawInventory';
+import ManualInventory from '../sales/ManualInventory';
 
-type EditorType = 'product' | 'inventory' | null;
+type EditorType = 'product' | 'inventory' |'Winventory'| null;
 
 /* ===========================
    Datos iniciales (create)
@@ -29,8 +31,13 @@ const emptyInventory: InventoryItem = {
   price: 0,
   description: '',
   arrivalDate: '',
+  outDate: '',
   barcode: '',
   product: emptyProduct,
+};
+const emptyWInventory: WInventory = {
+  barCode: '',
+  dateOut: ''
 };
 
 export default function Welcome() {
@@ -48,6 +55,11 @@ export default function Welcome() {
 
   const openInventoryEditor = () => {
     setEditor('inventory');
+    setOpen(true);
+  };
+
+  const openWInventoryEditor = () => {
+    setEditor('Winventory');
     setOpen(true);
   };
 
@@ -98,7 +110,7 @@ export default function Welcome() {
           {/* Acción futura */}
           <button
             className="flex flex-row items-center gap-3 p-4 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white font-semibold transition"
-            onClick={() => console.log('Retirar producto')}
+            onClick={openWInventoryEditor}
             aria-label="Retirar"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -127,7 +139,6 @@ export default function Welcome() {
           <ProductEditor
             initialData={emptyProduct}
             onSave={(data) => {
-              console.log('Producto guardado:', data);
               closeModal();
             }}
           />
@@ -137,9 +148,15 @@ export default function Welcome() {
           <InventoryEditor
             initialData={emptyInventory}
             onSave={(data) => {
-              console.log('Inventario guardado:', data);
               closeModal();
             }}
+          />
+        )}
+
+        {editor === 'Winventory' && (
+          <ManualInventory
+            initialData={emptyWInventory}
+            
           />
         )}
       </Modal>

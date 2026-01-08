@@ -20,6 +20,7 @@ const currentItem: InventoryItem = {
   price: 0,
   description: '',
   arrivalDate: '',
+  outDate: '',
   barcode: '',
   product: emptyProduct,
 };
@@ -114,6 +115,7 @@ export default function InventoryTable() {
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Precio</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Marca</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Fecha Ingreso</th>
+              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Fecha Salida</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Codigo Barras</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Descripcion</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Modficar Registro</th>
@@ -129,6 +131,7 @@ export default function InventoryTable() {
                   <td className="px-6 py-4 text-black">{item.price}</td>
                   <td className="px-6 py-4 text-black">{item.product.model}</td>
                   <td className="px-6 py-4 text-black">{formatDateForInput(item.arrivalDate)}</td>
+                  <td className="px-6 py-4 text-black">{formatDateForInput(item.outDate)}</td>
                   <td className="px-6 py-4 text-black">{item.barcode}</td>
                   <td className="px-6 py-4 text-black">{item.description}</td>
                   <td className="px-6 py-4 text-black"><button 
@@ -186,7 +189,6 @@ export default function InventoryTable() {
         <InventoryEditor
           initialData={currentItem}
           onSave={(data) => {
-            console.log('Inventario guardado:', data);
             closeModal();
           }}
         />

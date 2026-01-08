@@ -1,5 +1,6 @@
 package com.tuzonapcgamer.service.implement;
 
+import com.tuzonapcgamer.dto.WInventory;
 import com.tuzonapcgamer.model.InventoryItem;
 import com.tuzonapcgamer.repository.InventoryItemREP;
 import com.tuzonapcgamer.service.facade.InventoryService;
@@ -48,6 +49,38 @@ public class InventoryImpl implements InventoryService {
             return repository.save(manufacturer);
         }
         return createInventoryItem(manufacturer);
+    }
+
+    @Override
+    public WInventory SaveOUT(WInventory wInventory) {
+        if (wInventory.getBarCode() == null || wInventory.getBarCode().isBlank()) {
+            return error(wInventory, "El código de barras es obligatorio.");
+        }
+        if (wInventory.getDateOut() == null ) {
+            return error(wInventory, "La fecha de Retiro es obligatoria.");
+        }
+
+        return repository.findByBarCode(wInventory.getBarCode())
+                .map(item -> {
+                    item.setOutDate(wInventory.getDateOut());
+                    item.setQuantity(1);
+                    repository.save(item);
+
+                    wInventory.setCodeName("success");
+                    wInventory.setMessageName("Retiro exitoso.");
+                    return wInventory;
+
+                })
+                .orElseGet(() ->
+                        error(wInventory,
+                                "No existe inventario con el código: " + wInventory.getBarCode())
+                );
+    }
+
+    private WInventory error(WInventory wInventory, String message) {
+        wInventory.setCodeName("error");
+        wInventory.setMessageName(message);
+        return wInventory;
     }
 
     private InventoryItem createInventoryItem(InventoryItem manufacturer){

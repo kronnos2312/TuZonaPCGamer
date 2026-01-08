@@ -1,6 +1,7 @@
 package com.tuzonapcgamer.controller;
 
 import com.tuzonapcgamer.dto.ProductDTO;
+import com.tuzonapcgamer.dto.WInventory;
 import com.tuzonapcgamer.dto.nventoryDTO;
 import com.tuzonapcgamer.model.InventoryItem;
 import com.tuzonapcgamer.model.Product;
@@ -34,6 +35,10 @@ public class InventoryController {
         if(object.getId() == null)
             return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(this.service.save(object));
+    }
+    @PostMapping("/out")
+    public ResponseEntity<WInventory> saveDTO(@RequestBody WInventory object) {
+        return ResponseEntity.ok(this.service.SaveOUT(object));
     }
 
     @PostMapping("/dto")

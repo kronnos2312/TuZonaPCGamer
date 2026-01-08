@@ -29,7 +29,6 @@ export default function ProductTable() {
     currentItem.name = item.name;
     currentItem.model = item.model;
     currentItem.brand = item.brand;
-    console.log(JSON.stringify(currentItem))
     setEditor('product');
     setOpen(true);
   }
@@ -165,7 +164,6 @@ export default function ProductTable() {
               <ProductEditor
                 initialData={currentItem}
                 onSave={(data) => {
-                  console.log('Producto guardado:', data);
                   closeModal();
                 }}
               />

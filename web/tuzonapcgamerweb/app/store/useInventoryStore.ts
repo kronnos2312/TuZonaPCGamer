@@ -4,6 +4,7 @@ import {InventoryItem} from '../model/InventoryItem'
 
 import { useToastStore } from "./useToastStore";
 import { useLoaderStore } from '@/app/store/useLoaderStore';
+import { WInventory } from '../model/WithdrawInventory';
 type State = {
   inventory: InventoryItem[];
   inventoryShow: InventoryItem;
@@ -11,6 +12,7 @@ type State = {
   fetchInventory: () => Promise<void>;
   clearShowInventory: () => void;
   saveInventory:(data: InventoryItem) => void;
+  getOutInventory:(data: WInventory) => void;
   deleteInventory:(data: InventoryItem) => void;
 };
 
@@ -26,6 +28,7 @@ const  currentValue:InventoryItem = {
       model: ""
     },
     arrivalDate:"",
+    outDate: '',
     barcode:""
   };
 
@@ -42,9 +45,35 @@ export const useInventoryStore = create<State>((set,get) => ({
   clearShowInventory: ( ) => {
     set({ inventoryShow: currentValue })
   },
+  getOutInventory: async ( data: WInventory) => {
+    try {
+       /* Salvado objeto "data"*/
+      let result: any;
+
+      const response = await fetch(`${API_BASE_URL}/inventory/out`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      result = await response.json();
+      console.log(result)
+      if(result.codeName != "error"){
+        await get().fetchInventory();
+        get().clearShowInventory();
+        useToastStore.getState().showToast( "Inventario Retirado correctamente", "success" );
+      }else{
+        useToastStore.getState().showToast( "Se presento un eror con el Retiro de inventario:"+result.messageName, result.codeName );
+      }
+      // ✅ Actualizado Store
+      
+    } catch (error) {
+      console.error('Fetch inventory error:', error);
+      useToastStore.getState().showToast( "Error al Retirar inventario: "+error, "error" );
+    }
+  },
   saveInventory: async ( data: InventoryItem) => {
     try {
-      console.log(JSON.stringify(data))
        /* Salvado objeto "data"*/
       await fetch(`${API_BASE_URL}/inventory/dto`, {
         method:  'POST',

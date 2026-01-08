@@ -7,5 +7,6 @@ export type InventoryItem = {
     description: string;
     product: Product;
     arrivalDate:string;
+    outDate:string | "";
     barcode:string;
 };

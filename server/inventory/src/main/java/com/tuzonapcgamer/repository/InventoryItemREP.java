@@ -15,7 +15,7 @@ public interface InventoryItemREP extends JpaRepository<InventoryItem, Long> {
     @Query("from InventoryItem ii where ii.arrivalDate = :arrivalDate")
     public List<InventoryItem> findByArrivalTime(@Param("arrivalDate") Date arrivalDate);
 
-    @Query("from InventoryItem ii where ii.barcode like concat('%', :barcode,'%')  ")
-    public Optional<InventoryItem> findByBarCode(@Param("barcode")  String barcode);
+    @Query("from InventoryItem ii where ii.barcode = :barcode")
+    Optional<InventoryItem> findByBarCode(@Param("barcode") String barcode);
 
 }
