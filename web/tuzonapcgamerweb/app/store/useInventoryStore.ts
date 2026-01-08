@@ -63,7 +63,7 @@ export const useInventoryStore = create<State>((set,get) => ({
         get().clearShowInventory();
         useToastStore.getState().showToast( "Inventario Retirado correctamente", "success" );
       }else{
-        useToastStore.getState().showToast( "Se presento un eror con el Retiro de inventario:"+result.messageName, result.codeName );
+        useToastStore.getState().showToast( "Se presento un error con el Retiro de inventario:"+result.messageName, result.codeName );
       }
       // ✅ Actualizado Store
       
@@ -73,18 +73,25 @@ export const useInventoryStore = create<State>((set,get) => ({
     }
   },
   saveInventory: async ( data: InventoryItem) => {
+    let result: any;
     try {
+
        /* Salvado objeto "data"*/
-      await fetch(`${API_BASE_URL}/inventory/dto`, {
+      const response = await fetch(`${API_BASE_URL}/inventory/dto`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-
-      // ✅ Actualizado Store
-      await get().fetchInventory();
-      get().clearShowInventory();
-      useToastStore.getState().showToast( "Inventario guardado correctamente", "success" );
+      result = await response.json();
+      console.log(result)
+      if(result.codeName != "error"){
+        // ✅ Actualizado Store
+        await get().fetchInventory();
+        get().clearShowInventory();
+        useToastStore.getState().showToast( "Inventario guardado correctamente", "success" );
+      }else{
+        useToastStore.getState().showToast( "Se presento un error con el Registro del inventario:"+result.messageName, result.codeName );
+      }
     } catch (error) {
       console.error('Fetch inventory error:', error);
       useToastStore.getState().showToast( "Error al guardar inventario: "+error, "error" );

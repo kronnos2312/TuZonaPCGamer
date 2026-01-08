@@ -1,14 +1,15 @@
 package com.tuzonapcgamer.service.implement;
 
 import com.tuzonapcgamer.dto.WInventory;
+import com.tuzonapcgamer.dto.InventoryDTO;
 import com.tuzonapcgamer.model.InventoryItem;
 import com.tuzonapcgamer.repository.InventoryItemREP;
 import com.tuzonapcgamer.service.facade.InventoryService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +43,47 @@ public class InventoryImpl implements InventoryService {
     public Optional<InventoryItem> getByBarCode(String name) {
         return repository.findByBarCode(name);
     }
+
+    @Override
+    public InventoryDTO saveWithBarcodeValidation(
+            InventoryItem inventoryItem,
+            InventoryDTO dto) {
+
+        if (isBarcodeInvalid(inventoryItem)) {
+            return error(dto, "El código de barras es obligatorio.");
+        }
+
+        String barcode = inventoryItem.getBarcode();
+
+        // EDICIÓN
+        if (inventoryItem.getId() != 0) {
+
+            InventoryItem current = repository.findById(inventoryItem.getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Inventario no encontrado."));
+
+            return repository.findByBarCode(barcode)
+                    .filter(other -> !other.getId().equals(current.getId()))
+                    .map(existing -> error(dto, "El código de barras ya está registrado."))
+                    .orElseGet(() -> success(dto, inventoryItem, "Inventario guardado exitosamente."));
+        }
+
+        // CREACIÓN
+        return repository.findByBarCode(barcode)
+                .map(existing -> error(dto, "El código de barras ya está registrado."))
+                .orElseGet(() -> success(dto, inventoryItem, "Inventario registrado exitosamente."));
+    }
+
+    private boolean isBarcodeInvalid(InventoryItem item) {
+        return item.getBarcode() == null || item.getBarcode().isBlank();
+    }
+
+    private InventoryDTO success(InventoryDTO dto, InventoryItem item, String message) {
+        save(item);
+        dto.setCodeName("success");
+        dto.setMessageName(message);
+        return dto;
+    }
+
 
     @Override
     public InventoryItem save(InventoryItem manufacturer) {
@@ -78,6 +120,12 @@ public class InventoryImpl implements InventoryService {
     }
 
     private WInventory error(WInventory wInventory, String message) {
+        wInventory.setCodeName("error");
+        wInventory.setMessageName(message);
+        return wInventory;
+    }
+
+    private InventoryDTO error(InventoryDTO wInventory, String message) {
         wInventory.setCodeName("error");
         wInventory.setMessageName(message);
         return wInventory;

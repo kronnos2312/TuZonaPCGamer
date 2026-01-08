@@ -1,18 +1,15 @@
 package com.tuzonapcgamer.controller;
 
-import com.tuzonapcgamer.dto.ProductDTO;
 import com.tuzonapcgamer.dto.WInventory;
-import com.tuzonapcgamer.dto.nventoryDTO;
+import com.tuzonapcgamer.dto.InventoryDTO;
 import com.tuzonapcgamer.model.InventoryItem;
 import com.tuzonapcgamer.model.Product;
-import com.tuzonapcgamer.repository.ProductREP;
 import com.tuzonapcgamer.service.facade.InventoryService;
 import com.tuzonapcgamer.service.facade.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -42,11 +39,11 @@ public class InventoryController {
     }
 
     @PostMapping("/dto")
-    public ResponseEntity<InventoryItem> saveDTO(@RequestBody nventoryDTO object) {
+    public ResponseEntity<InventoryDTO> saveDTO(@RequestBody InventoryDTO object) {
         Product keep = productService.validateOrSave(object.getProduct());
         InventoryItem casted = object.cast();
         casted.setProduct(keep);
-        return ResponseEntity.ok(this.service.save(casted));
+       return ResponseEntity.ok(this.service.saveWithBarcodeValidation(casted, object));
     }
 
     @GetMapping("/inventory/id/{id}")

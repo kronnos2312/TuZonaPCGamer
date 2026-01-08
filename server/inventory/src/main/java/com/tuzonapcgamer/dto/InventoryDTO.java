@@ -1,15 +1,13 @@
 package com.tuzonapcgamer.dto;
 
 import com.tuzonapcgamer.model.InventoryItem;
-import com.tuzonapcgamer.model.Product;
-import com.tuzonapcgamer.repository.ProductREP;
 
 import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.Date;
 
-public class nventoryDTO {
+public class InventoryDTO {
     private Long id;
     private Long quantity;
     private Long price;
@@ -17,6 +15,25 @@ public class nventoryDTO {
     private ProductDTO product;
     private String arrivalDate;
     private String barcode;
+
+    private String codeName;
+    private String messageName;
+
+    public String getCodeName() {
+        return codeName;
+    }
+
+    public void setCodeName(String codeName) {
+        this.codeName = codeName;
+    }
+
+    public String getMessageName() {
+        return messageName;
+    }
+
+    public void setMessageName(String messageName) {
+        this.messageName = messageName;
+    }
 
     public Long getId() {
         return id;
