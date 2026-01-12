@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 import UserDropdown from './UserDropdown';
+import Image from 'next/image'; 
+import { ENV } from './constants/env'; 
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,7 +15,15 @@ export default function Layout({ children, activeTab, onTabChange }: LayoutProps
       
       {/* Sidebar (solo visible en md en adelante) */}
       <aside className="hidden md:flex md:w-16 bg-white border-r flex-col items-center py-4 space-y-6">
-        <div className="w-8 h-8 bg-black rounded-full" />
+        {/*<div className="w-8 h-8 bg-black rounded-full">
+          <Image
+                  src={ENV.BaseLogo}
+                  alt="Cargando..."
+                  width={80}
+                  height={80}
+                  priority
+                />
+        </div>*/}
         <div className="flex flex-col gap-6" />
       </aside>
 

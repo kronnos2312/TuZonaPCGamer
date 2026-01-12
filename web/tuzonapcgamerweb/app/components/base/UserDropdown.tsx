@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Systems from './Systems';
 import Image from 'next/image';
-
+import { ENV } from './constants/env'; 
 
 export default function UserDropdown() {
   const [open, setOpen] = useState(false);
@@ -41,7 +41,7 @@ export default function UserDropdown() {
       </button>
       */}
       <Image
-        src="/img/Testing_LOGO.png"
+        src={ENV.BaseLogo}
         alt="Cargando..."
         width={80}
         height={80}

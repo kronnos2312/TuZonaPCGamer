@@ -39,6 +39,8 @@ const emptyWInventory: WInventory = {
   barCode: '',
   dateOut: ''
 };
+const appClient = process.env.NEXT_PUBLIC_SITE_CLIENT || 'Cliente de Prueba';
+const appTitle = process.env.NEXT_PUBLIC_SITE_TITLE || '------';
 
 export default function Welcome() {
   const [open, setOpen] = useState(false);
@@ -71,11 +73,11 @@ export default function Welcome() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white px-6 text-center">
       <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
-        Bienvenido al Sistema de Inventarios
+        Bienvenido al {appTitle}
       </h1>
 
       <h2 className="text-2xl md:text-3xl font-semibold text-indigo-400 mb-8">
-        Tuzona PC Gamer
+        {appClient}
       </h2>
 
       {/* Ejemplo botón para avanzar o navegar */}
