@@ -2,125 +2,192 @@
 
 import { useEffect, useState } from 'react';
 import { userProductStore } from '@/app/store/userProductStore';
-
 import Modal from '../base/context/Modal';
 import ProductEditor from './editor/Product';
 import { Product } from '@/app/model/Product';
-/*interface Product {
-  id: number | string;
-  name: string;
-  model: string;
-  brand: string;
-}*/
+
 type EditorType = 'product' | null;
+
 const currentItem: Product = {
-  id:0,
-  name:'',
-  model:'',
-  brand:''
+  id: 0,
+  name: '',
+  model: '',
+  brand: '',
 };
 
 export default function ProductTable() {
-  // MODAL EDITOR
+  /* =========================
+     STATE
+  ========================= */
   const [open, setOpen] = useState(false);
   const [editor, setEditor] = useState<EditorType>(null);
-  const openEditor = (item:any) => {
-    currentItem.id = item.id;
-    currentItem.name = item.name;
-    currentItem.model = item.model;
-    currentItem.brand = item.brand;
-    setEditor('product');
-    setOpen(true);
-  }
-  const closeModal = () => {
-    setOpen(false);
-    setEditor(null);
-  };
-  // Component Functions
+
   const { product, fetchProduct } = userProductStore();
 
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
+  const [filters, setFilters] = useState({
+    name: '',
+    model: '',
+    brand: '',
+  });
+
+  /* =========================
+     EFFECTS
+  ========================= */
   useEffect(() => {
     fetchProduct();
-  }, []); // si fetchProduct es estable, está bien poner un arreglo vacío
+  }, [fetchProduct]);
 
-  // Filtrar productos por búsqueda
-  const filteredProducts = product.filter((item: Product) =>
-    `${item.name} ${item.model} ${item.brand}`.toLowerCase().includes(search.toLowerCase())
-  );
-
-  // Calcular paginación
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-
-  // Reiniciar a página 1 al buscar o cambiar items por página
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, itemsPerPage]);
+  }, [search, filters, itemsPerPage]);
 
+  /* =========================
+     HANDLERS
+  ========================= */
+  const openEditor = (item: Product) => {
+    Object.assign(currentItem, item);
+    setEditor('product');
+    setOpen(true);
+  };
+
+  const closeModal = () => {
+    setOpen(false);
+    setEditor(null);
+  };
+
+  const handleFilterChange = (
+    field: keyof typeof filters,
+    value: string
+  ) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  /* =========================
+     DATA
+  ========================= */
+  const filteredProducts = product.filter(item => {
+    const globalMatch =
+      `${item.name} ${item.model} ${item.brand}`
+        .toLowerCase()
+        .includes(search.toLowerCase());
+
+    const columnMatch =
+      item.name.toLowerCase().includes(filters.name.toLowerCase()) &&
+      item.model.toLowerCase().includes(filters.model.toLowerCase()) &&
+      item.brand.toLowerCase().includes(filters.brand.toLowerCase());
+
+    return globalMatch && columnMatch;
+  });
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedProducts = filteredProducts.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  /* =========================
+     RENDER
+  ========================= */
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4 text-black">Productos</h1>
+    <div className="p-6 bg-slate-50 min-h-screen font-sans">
+      <h1 className="text-2xl font-semibold text-slate-800 mb-6">
+        Productos
+      </h1>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+      {/* CONTROLES */}
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-6">
         <input
           type="text"
-          placeholder="Buscar por nombre, modelo o marca..."
-          className="w-full sm:w-1/2 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Búsqueda global..."
+          className="w-full sm:w-1/2 px-4 py-2 text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-400 focus:outline-none"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={e => setSearch(e.target.value)}
         />
 
-        <div>
-          <label htmlFor="itemsPerPage" className="mr-2 text-sm text-gray-600">Mostrar:</label>
-          <select
-            id="itemsPerPage"
-            value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-            className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-          </select>
-        </div>
+        <select
+          value={itemsPerPage}
+          onChange={e => setItemsPerPage(Number(e.target.value))}
+          className="px-3 py-2 text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-400 focus:outline-none"
+        >
+          <option value={5}>5 registros</option>
+          <option value={10}>10 registros</option>
+          <option value={20}>20 registros</option>
+        </select>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-          <thead className="bg-gray-100 border-b">
+      {/* TABLA */}
+      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+        <table className="min-w-full text-sm">
+          <thead className="bg-slate-100 border-b border-slate-200">
             <tr>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Id</th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Nombre</th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Modelo</th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Marca</th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Modficar Registro</th>
-             {/* <th className="text-left px-6 py-3 text-sm font-medium text-gray-700">Remover</th>*/}
+              <th className="px-6 py-3 text-left font-semibold text-slate-700">ID</th>
+              <th className="px-6 py-3 text-left font-semibold text-slate-700">Nombre</th>
+              <th className="px-6 py-3 text-left font-semibold text-slate-700">Modelo</th>
+              <th className="px-6 py-3 text-left font-semibold text-slate-700">Marca</th>
+              <th className="px-6 py-3 text-left font-semibold text-slate-700">Acción</th>
+            </tr>
+
+            {/* FILTROS */}
+            <tr className="bg-slate-50 border-t border-slate-200">
+              <th />
+              <th className="px-4 py-2">
+                <input
+                  placeholder="Filtrar nombre"
+                  value={filters.name}
+                  onChange={e => handleFilterChange('name', e.target.value)}
+                  className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-slate-400"
+                />
+              </th>
+              <th className="px-4 py-2">
+                <input
+                  placeholder="Filtrar modelo"
+                  value={filters.model}
+                  onChange={e => handleFilterChange('model', e.target.value)}
+                  className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-slate-400"
+                />
+              </th>
+              <th className="px-4 py-2">
+                <input
+                  placeholder="Filtrar marca"
+                  value={filters.brand}
+                  onChange={e => handleFilterChange('brand', e.target.value)}
+                  className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-slate-400"
+                />
+              </th>
+              <th />
             </tr>
           </thead>
+
           <tbody>
-            {paginatedProducts.length > 0 ? (
-              paginatedProducts.map((item) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 text-black">{item.id}</td>
-                  <td className="px-6 py-4 text-black">{item.name}</td>
-                  <td className="px-6 py-4 text-black">{item.model}</td>
-                  <td className="px-6 py-4 text-black">{item.brand}</td>
-                  <td className="px-6 py-4 text-black"><button 
-                  className="px-3 py-1 bg-yellow-200 text-black-700 rounded"
-                  onClick={()=>openEditor(item)}
-                  >Editar</button></td>
-                 {/*  <td className="px-6 py-4 text-black"><button className="px-3 py-1 bg-red-200 text-black-700 rounded">Remover</button></td>*/}
+            {paginatedProducts.length ? (
+              paginatedProducts.map(item => (
+                <tr
+                  key={item.id}
+                  className="border-b hover:bg-slate-50"
+                >
+                  <td className="px-6 py-4 text-slate-700">{item.id}</td>
+                  <td className="px-6 py-4 text-slate-700">{item.name}</td>
+                  <td className="px-6 py-4 text-slate-700">{item.model}</td>
+                  <td className="px-6 py-4 text-slate-700">{item.brand}</td>
+                  <td className="px-6 py-4">
+                    <button
+                      onClick={() => openEditor(item)}
+                      className="px-4 py-1.5 text-sm font-medium rounded-md bg-amber-400 hover:bg-amber-500 text-amber-900"
+                    >
+                      Editar
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
-                  No se encontraron productos.
+                <td colSpan={5} className="py-6 text-center text-sm text-slate-500">
+                  No se encontraron productos
                 </td>
               </tr>
             )}
@@ -128,47 +195,35 @@ export default function ProductTable() {
         </table>
       </div>
 
-      {/* Controles de paginación */}
-      <div className="flex justify-between items-center mt-4">
-        <span className="text-sm text-gray-600">
+      {/* PAGINACIÓN */}
+      <div className="flex justify-between items-center mt-6">
+        <span className="text-xs text-slate-600">
           Página {currentPage} de {totalPages || 1}
         </span>
         <div className="space-x-2">
           <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+            className="px-4 py-1.5 text-sm font-medium bg-slate-200 rounded disabled:opacity-50"
           >
             Anterior
           </button>
           <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
             disabled={currentPage === totalPages || totalPages === 0}
-            className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+            className="px-4 py-1.5 text-sm font-medium bg-slate-200 rounded disabled:opacity-50"
           >
             Siguiente
           </button>
         </div>
       </div>
 
-       {/* ===========================
-              Modal de editores
-              =========================== */
-            }
-          <Modal
-            isOpen={open}
-            onClose={closeModal}
-            title='Editar Producto'           
-          >
-            {editor === 'product' && (
-              <ProductEditor
-                initialData={currentItem}
-                onSave={(data) => {
-                  closeModal();
-                }}
-              />
-            )}
-          </Modal>
+      {/* MODAL */}
+      <Modal isOpen={open} onClose={closeModal} title="Editar Producto">
+        {editor === 'product' && (
+          <ProductEditor initialData={currentItem} onSave={closeModal} />
+        )}
+      </Modal>
     </div>
   );
 }
